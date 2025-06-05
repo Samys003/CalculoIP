@@ -1,10 +1,15 @@
 package br.dev.samara.CalculoIP;
 
-import java.util.Scanner;
+
+
+import br.dev.samara.CalculoIP.gui.InterfaceIP;
 
 public class main {
 
 	public static void main(String[] args) {
+		
+	InterfaceIP tela = new InterfaceIP();
+	tela.criarTela();
 		
 	
 	}
