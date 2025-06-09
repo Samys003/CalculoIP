@@ -1,11 +1,18 @@
 package br.dev.samara.CalculoIP.gui;
 
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+
+import br.dev.samara.CalculoIP.model.CalculoIP;
 
 public class InterfaceIP {
 
@@ -21,6 +28,7 @@ public class InterfaceIP {
 	private JTextField txtSegundoOcteto;
 	private JTextField txtTerceiroOcteto;
 	private JTextField txtQuartoOcteto;
+	private JList<String> listaresultados;
 	
 	private JButton btnCalcular;
 	private JButton btnLimpar;
@@ -28,8 +36,6 @@ public class InterfaceIP {
 	
 	
 public void criarTela(){
-	
-	      
 	
 	JFrame tela = new JFrame();
 	tela.setSize(500, 500);
@@ -89,6 +95,55 @@ public void criarTela(){
 	btnLimpar.setText("Limpar");
 	btnLimpar.setBounds(250, 110, 100, 40);
 	
+	
+
+	btnLimpar.addActionListener(new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			 try {
+		            String oct1 = txtPrimeiroOcteto.getText().trim();
+		            String oct2 = txtSegundoOcteto.getText().trim();
+		            String oct3 = txtTerceiroOcteto.getText().trim();
+		            String oct4 = txtQuartoOcteto.getText().trim();
+		            String cidr = txtcidr.getText().trim();
+
+		            // Verificação simples
+		            if (oct1.isEmpty() || oct2.isEmpty() || oct3.isEmpty() || oct4.isEmpty() || cidr.isEmpty()) {
+		                JOptionPane.showMessageDialog(null, "Por favor, preencha todos os campos.");
+		                return;
+		            }
+
+		            String ipCompleto = oct1 + "." + oct2 + "." + oct3 + "." + oct4 + "/" + cidr;
+
+		            // Chama a lógica da classe
+		            CalculoIP calculo = new CalculoIP();
+		            calculo.setIp(ipCompleto);
+		            calculo.separacaoIP();
+		            calculo.ClasseIP();
+		            calculo.converterMascaraBinario();
+		            calculo.converterMascaraDecimal();
+		            calculo.calcularHosts();
+		            calculo.calcularSubRedes();
+		            String[] resultado = calculo.visualizarResultado();
+		            
+		            
+
+		            // Mostra os resultados
+		            StringBuilder msg = new StringBuilder();
+		            for (String linha : resultado) {
+		                msg.append(linha).append("\n");
+		            }
+
+		            JOptionPane.showMessageDialog(null, msg.toString(), "Resultado", JOptionPane.INFORMATION_MESSAGE);
+
+		        } catch (Exception ex) {
+		            JOptionPane.showMessageDialog(null, "Erro ao calcular: " + ex.getMessage());
+		        }
+		    }
+		});
+	
+	
 	Container painel = tela.getContentPane();
 	
 	painel.add(lblDigiteIp);
@@ -105,19 +160,7 @@ public void criarTela(){
 	painel.add(btnCalcular);
 	painel.add(btnLimpar);
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	tela.setVisible(true);
 	}

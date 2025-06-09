@@ -10,6 +10,10 @@ public class CalculoIP {
 	private String mascaraBinario = "";
 	private String mascaraDecimal = "";
 	private String[] octetos;
+	private String ipBroadcast;
+	private String primeiroIpValido;
+	private String ultimoIpValido;
+	
 	
 	public void setIp(String ip) {
 		this.IP = ip;
@@ -49,7 +53,7 @@ public class CalculoIP {
 		
 	}
 
-	public String converterBinario() {
+	public String converterMascaraBinario() {
 		int contador = 0;
 		int octeto = 0;
 		while (contador < cidr) {
@@ -78,7 +82,7 @@ public class CalculoIP {
 		return mascaraBinario;
 }
 
-	public String converterDecimal(){
+	public String converterMascaraDecimal(){
 		
 		String[] splitBinario = mascaraBinario.split("\\.");
 		
@@ -165,30 +169,81 @@ public class CalculoIP {
 		return subRedes;
 	}
 	
-	public String[] visualizarResultado() {
-		
+    public void calcularIpsEspeciais() {
+        if(classe.equals("Classe D (Multicast)") || classe.equals("Classe E (Reservada)")) {
+            primeiroIpValido = "Não aplicável";
+            ultimoIpValido = "Não aplicável";
+            ipBroadcast = "Não aplicável";
+            return;
+        }
+
+        String[] mascaraOctetos = mascaraDecimal.split("\\.");
+        int[] ipOctetos = new int[4];
+        int[] networkOctetos = new int[4];
+        int[] broadcastOctetos = new int[4];
+
+        
+        for(int i = 0; i < 4; i++) {
+            ipOctetos[i] = Integer.parseInt(octetos[i]);
+        }
+
+        
+        for(int i = 0; i < 4; i++) {
+            int mascara = Integer.parseInt(mascaraOctetos[i]);
+            networkOctetos[i] = ipOctetos[i] & mascara;
+        }
+
+        
+        for(int i = 0; i < 4; i++) {
+            int mascara = Integer.parseInt(mascaraOctetos[i]);
+            broadcastOctetos[i] = networkOctetos[i] | (~mascara & 0xFF);
+        }
+
+        
+        primeiroIpValido = networkOctetos[0] + "." + networkOctetos[1] + "." + 
+                          networkOctetos[2] + "." + (networkOctetos[3] + 1);
+
+        
+        ultimoIpValido = broadcastOctetos[0] + "." + broadcastOctetos[1] + "." + 
+                        broadcastOctetos[2] + "." + (broadcastOctetos[3] - 1);
+
+       
+        ipBroadcast = broadcastOctetos[0] + "." + broadcastOctetos[1] + "." + 
+                     broadcastOctetos[2] + "." + broadcastOctetos[3];
+    }
+
 	
-		String[] resultado = new String[6];
+	
+	public String[] visualizarResultado() {
+		calcularIpsEspeciais();
+	
+		String[] resultado = new String[9];
 		
 		resultado[0] = "IP: " + IP;
 		resultado[1] = "Classe do IP" + ClasseIP();
 		if(classe.equals("Classe D (Multicast)") || classe.equals("Classe E (Reservada)")) {
 			
 			resultado[2] = "Mascara em binario: IP´s de classe D ou E não possuem máscara.";
-			resultado[3] = "Mascara em decimal: IP´s de classe D ou E não possuem máscara.";
+			resultado[3] = "Mascara em decimal: IPd´s de classe D ou E não possuem máscara.";
 			resultado[4] = "IP's disponiveis por rede: Não aplicável";
 			resultado[5] = "Numero de sub-redes: Não possui";
-			
+			resultado[6] = "Primeiro IP válido: " + primeiroIpValido;
+	        resultado[7] = "Último IP válido: " + ultimoIpValido;
+	        resultado[8] = "IP Broadcast: " + ipBroadcast;
 			
 		} else {
 			
-			resultado[2] = "Mascara em binario: " + converterBinario();
-			resultado[3] = "Mascara em decimal: " + converterDecimal();
+			resultado[2] = "Mascara em binario: " + converterMascaraBinario();
+			resultado[3] = "Mascara em decimal: " + converterMascaraDecimal();
 			resultado[4] = "IP's disponiveis por rede: " + calcularHosts();
 			resultado[5] = "Numero de sub-redes: " + calcularSubRedes();
+			resultado[6] = "Primeiro IP válido: " + primeiroIpValido;
+	        resultado[7] = "Último IP válido: " + ultimoIpValido;
+	        resultado[8] = "IP Broadcast: " + ipBroadcast;
+		
 		}
 		
-		return visualizarResultado();
+		return resultado;
 	}
 	
 }
