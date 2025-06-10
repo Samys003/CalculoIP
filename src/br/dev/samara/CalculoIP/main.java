@@ -10,6 +10,8 @@ public class main {
 		
 	InterfaceIP tela = new InterfaceIP();
 	tela.criarTela();
+	
+	
 		
 	
 	}
